@@ -14,8 +14,13 @@ buildscript {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
         classpath("org.jetbrains.kotlin:kotlin-allopen:$kotlinVersion")
-        classpath 'nu.studer:gradle-jooq-plugin:2.0.7'
+        classpath 'nu.studer:gradle-jooq-plugin:2.0.9'
     }
+}
+
+plugins {
+    id 'jacoco'
+    id 'com.github.kt3k.coveralls' version '2.8.2'
 }
 
 apply plugin: 'kotlin'
@@ -30,10 +35,10 @@ version = '1.0-SNAPSHOT'
 sourceCompatibility = 1.8
 
 compileKotlin {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = sourceCompatibility
 }
 compileTestKotlin {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = sourceCompatibility
 }
 
 repositories {
@@ -55,7 +60,7 @@ dependencies {
 }
 
 jooq {
-    version = '3.10.0'
+    version = '3.10.1'
     edition = 'OSS'
     tables(sourceSets.main) {
         jdbc {
@@ -78,3 +83,14 @@ jooq {
         }
     }
 }
+// コンパイル時、常にJOOQのコードを自動生成する場合は以下を設定する
+//compileKotlin.dependsOn generateTablesJooqSchemaSource
+
+jacocoTestReport {
+    reports {
+        xml.enabled true // coveralls plugin depends on xml format report
+        html.enabled true
+        html.destination(new File("${buildDir}/jacocoHtml"))
+    }
+}
+jacocoTestReport.dependsOn test
