@@ -1,0 +1,29 @@
+version: 2
+jobs:
+  build:
+
+    working_directory: ~/kotlin-api-sample
+
+    docker:
+      - image: circleci/openjdk:8-jdk
+
+    steps:
+      - checkout
+
+      - restore_cache:
+          key:
+          - kotlin-api-sample-{{ checksum "build.gradle" }}
+          # fallback to using the latest cache if no exact match is found
+          - kotlin-api-sample-
+
+      - run: gradle dependencies
+
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: kotlin-api-sample-{{ checksum "build.gradle" }}
+
+      - run: gradle test jacocoTestReport coveralls
+
+      - store_test_results:
+          path: build/jacocoHtml
