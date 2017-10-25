@@ -11,7 +11,7 @@ jobs:
       - checkout
 
       - restore_cache:
-          key:
+          keys:
           - kotlin-api-sample-{{ checksum "build.gradle" }}
           # fallback to using the latest cache if no exact match is found
           - kotlin-api-sample-
