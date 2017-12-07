@@ -1,6 +1,8 @@
+import org.gradle.util.GFileUtils
+
 buildscript {
     ext {
-        kotlinVersion = '1.1.51'
+        kotlinVersion = '1.2.0'
         springBootVersion = '2.0.0.BUILD-SNAPSHOT'
     }
 
@@ -14,7 +16,8 @@ buildscript {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
         classpath("org.jetbrains.kotlin:kotlin-allopen:$kotlinVersion")
-        classpath 'nu.studer:gradle-jooq-plugin:2.0.9'
+        classpath('nu.studer:gradle-jooq-plugin:2.0.9')
+        classpath("gradle.plugin.org.jmailen.gradle:kotlinter-gradle:1.6.0")
     }
 }
 
@@ -29,6 +32,7 @@ apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'nu.studer.jooq'
+apply plugin: "org.jmailen.kotlinter"
 
 group = 'box.white.seriwb'
 version = '1.0-SNAPSHOT'
@@ -59,10 +63,14 @@ dependencies {
     testCompile('io.projectreactor:reactor-test')
 }
 
+sourceSets {
+    intJooq
+}
+
 jooq {
     version = '3.10.1'
     edition = 'OSS'
-    tables(sourceSets.main) {
+    tables(sourceSets.intJooq) {
         jdbc {
             driver = 'org.h2.Driver'
             url = 'jdbc:h2:./test;AUTO_SERVER=TRUE'
@@ -73,18 +81,37 @@ jooq {
             name = 'org.jooq.util.DefaultGenerator'
             database {
                 name = 'org.jooq.util.h2.H2Database'
+                inputSchema = ''
                 includes = '.*'
                 excludes = ''
             }
             target {
                 packageName = 'box.white.seriwb.api.jooq'
-                directory = 'src/main/java'
+                //directory = 'src/main/java'
             }
         }
     }
 }
+
+// cleanタスクで生成されたコードが削除されないようにするため、1つ段階を踏む
+task copyJooq(dependsOn: [clean, generateTablesJooqSchemaSource]) {
+    doLast {
+        File targetDir = new File("src/main/java/box/white/seriwb/api/jooq")
+        targetDir.deleteDir()
+
+        File jooqDir = new File("build/generated-src/jooq/tables")
+        GFileUtils.copyDirectory(jooqDir, new File("src/main/java"))
+    }
+}
 // コンパイル時、常にJOOQのコードを自動生成する場合は以下を設定する
-//compileKotlin.dependsOn generateTablesJooqSchemaSource
+//compileKotlin.dependsOn copyJooq
+
+kotlinter {
+    ignoreFailures = true
+    indentSize = 4
+    continuationIndentSize = 8
+    reporters = ['checkstyle', 'plain']
+}
 
 jacocoTestReport {
     reports {
