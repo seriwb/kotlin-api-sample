@@ -22,12 +22,11 @@ class KotlinApiClient {
      */
     fun sendMessage(str: String): String =
             client
-                .get()                  // GETリクエスト
-                .uri("/master/cours")      // アクセス先URL
-                .accept(MediaType.APPLICATION_JSON_UTF8)    // 送信ヘッダ
+                .get() // GETリクエスト
+                .uri("/master/cours") // アクセス先URL
+                .accept(MediaType.APPLICATION_JSON_UTF8) // 送信ヘッダ
                 .retrieve()             // 送信実施
                 .bodyToMono<String>()   // 文字列の受信
                 .block()                // 応答待ち
                 .orEmpty()              // nullの場合に空文字返却
-
 }

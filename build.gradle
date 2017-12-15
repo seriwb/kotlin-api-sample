@@ -56,6 +56,7 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-webflux')
     compile("org.jetbrains.kotlin:kotlin-stdlib-jre8:${kotlinVersion}")
     compile("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
+    compile("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.2")
     runtime('org.springframework.boot:spring-boot-devtools')
     runtime('com.h2database:h2:1.4.196')
     jooqRuntime('com.h2database:h2:1.4.196')
@@ -92,6 +93,7 @@ jooq {
         }
     }
 }
+generateTablesJooqSchemaSource.onlyIf { name != 'build' }
 
 // cleanタスクで生成されたコードが削除されないようにするため、1つ段階を踏む
 task copyJooq(dependsOn: [clean, generateTablesJooqSchemaSource]) {
@@ -103,7 +105,7 @@ task copyJooq(dependsOn: [clean, generateTablesJooqSchemaSource]) {
         GFileUtils.copyDirectory(jooqDir, new File("src/main/java"))
     }
 }
-// コンパイル時、常にJOOQのコードを自動生成する場合は以下を設定する
+// コンパイル時、常にJOOQのコードを自動生成する場合は以下を設定する（開発用）
 //compileKotlin.dependsOn copyJooq
 
 kotlinter {
@@ -114,6 +116,12 @@ kotlinter {
 }
 
 jacocoTestReport {
+    doFirst {
+        classDirectories = fileTree(
+                dir: 'build/classes/kotlin',
+                excludes: [ '**/jooq/*' ]
+        )
+    }
     reports {
         xml.enabled true // coveralls plugin depends on xml format report
         html.enabled true

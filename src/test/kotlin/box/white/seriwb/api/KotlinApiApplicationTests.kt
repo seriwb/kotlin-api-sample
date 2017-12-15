@@ -12,5 +12,4 @@ class KotlinApiApplicationTests {
 	@Test
 	fun contextLoads() {
 	}
-
 }

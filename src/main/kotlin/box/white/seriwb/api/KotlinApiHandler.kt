@@ -14,7 +14,6 @@ import org.springframework.web.reactive.function.server.ServerResponse.ok
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
-
 /**
  * 公開しているURLがハンドルする処理を記述するクラス
  */
@@ -25,7 +24,6 @@ class KotlinApiHandler {
     fun index(req: ServerRequest): Mono<ServerResponse> =
             // Fluxは複数の値を順に返していく
             ok().body(Flux.just("Hello", "World!"), String::class.java)
-
 
     //------ DBアクセス系の挙動確認 ---------
     @Autowired
@@ -78,15 +76,23 @@ class KotlinApiHandler {
 
         val id = req.pathVariable("id").toLong()
 
-        val result = create
-                .select()
-                .from(SAMPLE)
-                .where(SAMPLE.ID.eq(id))
-                .fetch()
+//        val result = create
+//                .select()
+//                .from(SAMPLE)
+//                .where(SAMPLE.ID.eq(id))
+//                .fetch()
+//
+//        return ok()
+//                .contentType(MediaType.APPLICATION_JSON_UTF8)
+//                .syncBody("{\"result\":\"$result\"}")
 
-        return ok()
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .syncBody("{\"result\":\"$result\"}")
+        val db = KotlinApiReactiveJdbc<String>()
+        return db.execute {
+            create.select()
+                    .from(SAMPLE)
+                    .where(SAMPLE.ID.eq(id))
+                    .fetch().format()
+        }
     }
 
     @Transactional
@@ -102,7 +108,7 @@ class KotlinApiHandler {
         val s = SAMPLE
         val result = create
                 .update(s)
-                .set(s.KEY, key.orElse("99"))   // 元の値を引っ張っていればそれをElse値にしてあげれば良さそう
+                .set(s.KEY, key.orElse("99")) // 元の値を引っ張っていればそれをElse値にしてあげれば良さそう
                 .set(s.VALUE, value.orElse("test99"))
                 .where(s.ID.eq(id))
                 .execute()
