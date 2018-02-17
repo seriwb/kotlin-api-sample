@@ -54,7 +54,6 @@ repositories {
 dependencies {
     compile('org.springframework.boot:spring-boot-starter-jooq')
     compile('org.springframework.boot:spring-boot-starter-webflux')
-    compile("org.jetbrains.kotlin:kotlin-stdlib-jre8:${kotlinVersion}")
     compile("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
     compile("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.2")
     runtime('org.springframework.boot:spring-boot-devtools')
@@ -62,6 +61,7 @@ dependencies {
     jooqRuntime('com.h2database:h2:1.4.196')
     testCompile('org.springframework.boot:spring-boot-starter-test')
     testCompile('io.projectreactor:reactor-test')
+    testCompile('org.mockito:mockito-all:2.0.2-beta')
     testCompile('org.powermock:powermock-api-mockito:1.7.3')
 }
 
