@@ -12,7 +12,7 @@ class KotlinApiDao {
     @Autowired
     lateinit var create: DSLContext
 
-    fun findSample(id: Long): SampleRecord {
+    suspend fun findSample(id: Long): SampleRecord {
         val result = create
                 .selectFrom(SAMPLE)
                 .where(SAMPLE.ID.eq(id))

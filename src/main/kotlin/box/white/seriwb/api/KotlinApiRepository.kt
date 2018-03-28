@@ -1,5 +1,7 @@
 package box.white.seriwb.api
 
+import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.runBlocking
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
@@ -11,10 +13,10 @@ class KotlinApiRepository {
     lateinit var dao: KotlinApiDao
 
     @Transactional
-    fun getSimpleResponseData(id: Long): SimpleResponseData {
-        val sample = dao.findSample(id)
+    fun getSimpleResponseData(id: Long): SimpleResponseData = runBlocking {
+        val sample = async { dao.findSample(id) }
 
-        return SimpleResponseData(sample.value)
+        SimpleResponseData(sample.await().value)
     }
 }
 
