@@ -2,8 +2,8 @@ import org.gradle.util.GFileUtils
 
 buildscript {
     ext {
-        kotlinVersion = '1.2.0'
-        springBootVersion = '2.0.0.BUILD-SNAPSHOT'
+        kotlinVersion = '1.2.31'
+        springBootVersion = '2.0.0.RELEASE'
     }
 
     repositories {
@@ -52,6 +52,7 @@ repositories {
 }
 
 dependencies {
+    compile('org.jetbrains.kotlinx:kotlinx-coroutines-core:0.22.5')
     compile('org.springframework.boot:spring-boot-starter-jooq')
     compile('org.springframework.boot:spring-boot-starter-webflux')
     compile("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")

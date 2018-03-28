@@ -8,3 +8,10 @@
 - http://localhost:8080/api/dbuse/create
 - http://localhost:8080/api/dbuse/{id}
 - http://localhost:8080/api/dbuse/{id}/update
+
+
+## Sample of how to use coroutines
+
+Select sample table by coroutines.
+
+- http://localhost:8080/api/dbuse2/{id}

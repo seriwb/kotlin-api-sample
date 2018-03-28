@@ -22,6 +22,7 @@ class KotlinApiRouter(private val handler: KotlinApiHandler) {
                 GET("/dbuse/create", handler::dbInsert)
                 GET("/dbuse/{id}", handler::dbSelect)
                 GET("/dbuse/{id}/update", handler::dbUpdate)
+                GET("/dbuse2/{id}", handler::coroutineSelect)
             }
         }
     }
