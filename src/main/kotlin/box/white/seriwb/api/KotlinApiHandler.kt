@@ -1,6 +1,8 @@
 package box.white.seriwb.api
 
 import box.white.seriwb.api.jooq.public_.Tables.SAMPLE
+import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.runBlocking
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.Result
@@ -134,14 +136,16 @@ class KotlinApiHandler {
     @Autowired
     lateinit var repository: KotlinApiRepository
 
-    fun coroutineSelect(req: ServerRequest): Mono<ServerResponse> {
+    fun coroutineSelect(req: ServerRequest): Mono<ServerResponse> = runBlocking {
 
         val id = req.pathVariable("id").toLong()
 
-        val responseData = repository.getSimpleResponseData(id)
+        val responseData = async {
+            repository.getSimpleResponseData(id)
+        }
 
-        return ok().contentType(MediaType.APPLICATION_JSON_UTF8)
-                .syncBody("{\"result\":\"${responseData.envelope}\"}")
+        ok().contentType(MediaType.APPLICATION_JSON_UTF8)
+                .syncBody("{\"result\":\"${responseData.await().envelope}\"}")
     }
 
 }
